@@ -5,15 +5,15 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     Rigidbody rb;
-    [SerializeField]float movementThrust = 1000f;
-    [SerializeField]float rotationThrust = 500f;
-    // Start is called before the first frame update
+    AudioSource audioSource;
+    float movementThrust = 1000f;
+    float rotationThrust = 50f;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         ProcessMovement();
@@ -22,7 +22,10 @@ public class Movement : MonoBehaviour
     void ProcessMovement(){
         // if thrust
         if (Input.GetKey(KeyCode.Space)){
+            PlayAudio(false);
             rb.AddRelativeForce(Vector3.up * movementThrust * Time.deltaTime);
+        } else {
+            PlayAudio(true);
         }
         // if rotation
         if (Input.GetKey(KeyCode.A)){
@@ -37,5 +40,14 @@ public class Movement : MonoBehaviour
         rb.freezeRotation= true;
         transform.Rotate(Vector3.forward * newRotation * Time.deltaTime);
         rb.freezeRotation= false;
+    }
+
+    void PlayAudio(bool stop){
+        if (stop){
+            audioSource.Stop();
+        } else if (!audioSource.isPlaying){
+            // at this point we know we want to play autio
+            audioSource.Play();
+        }
     }
 }
