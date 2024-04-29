@@ -11,6 +11,11 @@ public class CollisionHandler : MonoBehaviour
     AudioSource audioSource;
     AudioClip death;
     AudioClip finish;
+    // we will create serialized fields for these ones becuase
+    // we already positioned where we want the particles to appear.
+    // this just makes it easier
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem crashParticles;
     // when we reload a state, it goes back to false. thus we do not want to revert state ourselves
     bool isTransitioning = false;
     void Start(){
@@ -45,6 +50,7 @@ public class CollisionHandler : MonoBehaviour
         // WHEN PLAYING SOUND, RELOADING OR LOADING A SCENE WILL STOP THE AUDIO
         audioSource.Stop();
         audioSource.PlayOneShot(finish);
+        successParticles.Play();
         GetComponent<Movement>().enabled = false;
         // calls the function AFTER 1 second float
         Invoke("LoadNextLevel", timeDelay);
@@ -55,6 +61,7 @@ public class CollisionHandler : MonoBehaviour
         // WHEN PLAYING SOUND, RELOADING OR LOADING A SCENE WILL STOP THE AUDIO
         audioSource.Stop();
         audioSource.PlayOneShot(death);
+        crashParticles.Play();
         GetComponent<Movement>().enabled = false;
         // calls the function AFTER 1 second float
         Invoke("ReloadCurrentLevel", timeDelay);

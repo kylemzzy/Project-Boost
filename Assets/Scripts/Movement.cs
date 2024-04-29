@@ -4,39 +4,70 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    float movementThrust = 1000f;
-    float rotationThrust = 50f;
+    const float MOVEMENT_THRUST = 1000f;
+    const float ROTATION_THRUST = 50f;
 
     Rigidbody rb;
     AudioSource audioSource;
-    AudioClip thrust;
+    AudioClip thrustSound;
+
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem leftThrusterParticles;
+    [SerializeField] ParticleSystem rightThrusterParticles;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
-        thrust = Resources.Load<AudioClip>("Sounds/thrust");
+        thrustSound = Resources.Load<AudioClip>("Sounds/thrust");
     }
 
     void Update()
     {
-        ProcessMovement();
+        ProcessThrustInput();
+        ProcessRotationInput();
     }
 
-    void ProcessMovement(){
-        // if thrust
-        if (Input.GetKey(KeyCode.Space)){
-            PlayAudio(false);
-            rb.AddRelativeForce(Vector3.up * movementThrust * Time.deltaTime);
-        } else {
-            PlayAudio(true);
+    void ProcessThrustInput()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.PlayOneShot(thrustSound);
+                mainEngineParticles.Play();
+            }
+            rb.AddRelativeForce(Vector3.up * MOVEMENT_THRUST * Time.deltaTime);
         }
-        // if rotation
-        if (Input.GetKey(KeyCode.A)){
-            ApplyRotation(rotationThrust);
-        } else if (Input.GetKey(KeyCode.D)){
-            ApplyRotation(-rotationThrust);
+        else
+        {
+            StopThrustEffects();
         }
+    }
 
+    void ProcessRotationInput()
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            ApplyRotation(ROTATION_THRUST);
+            EnsureParticleEffect(rightThrusterParticles);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            ApplyRotation(-ROTATION_THRUST);
+            EnsureParticleEffect(leftThrusterParticles);
+        }
+        else
+        {
+            StopRotationEffects();
+        }
+    }
+
+    private void EnsureParticleEffect(ParticleSystem particles)
+    {
+        if (!particles.isPlaying)
+        {
+            particles.Play();
+        }
     }
 
     void ApplyRotation(float newRotation){
@@ -45,12 +76,16 @@ public class Movement : MonoBehaviour
         rb.freezeRotation= false;
     }
 
-    void PlayAudio(bool stop){
-        if (stop){
-            audioSource.Stop();
-        } else if (!audioSource.isPlaying){
-            // at this point we know we want to play autio
-            audioSource.PlayOneShot(thrust);
-        }
+    void StopThrustEffects()
+    {
+        audioSource.Stop();
+        mainEngineParticles.Stop();
     }
+
+    void StopRotationEffects()
+    {
+        rightThrusterParticles.Stop();
+        leftThrusterParticles.Stop();
+    }
+
 }
