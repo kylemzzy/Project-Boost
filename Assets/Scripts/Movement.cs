@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    Rigidbody rb;
-    AudioSource audioSource;
     float movementThrust = 1000f;
     float rotationThrust = 50f;
+
+    Rigidbody rb;
+    AudioSource audioSource;
+    AudioClip thrust;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+        thrust = Resources.Load<AudioClip>("Sounds/thrust");
     }
 
     void Update()
@@ -47,7 +50,7 @@ public class Movement : MonoBehaviour
             audioSource.Stop();
         } else if (!audioSource.isPlaying){
             // at this point we know we want to play autio
-            audioSource.Play();
+            audioSource.PlayOneShot(thrust);
         }
     }
 }
