@@ -18,6 +18,7 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem crashParticles;
     // when we reload a state, it goes back to false. thus we do not want to revert state ourselves
     bool isTransitioning = false;
+    public bool isCollidable = true;
     void Start(){
         
         audioSource = GetComponent<AudioSource>();
@@ -26,8 +27,8 @@ public class CollisionHandler : MonoBehaviour
     }
     void OnCollisionEnter(Collision other)
     {   
-        // if we are not transitioning then return
-        if (isTransitioning) { return; }
+        // if we are not transitioning or colliding then return
+        if (isTransitioning || !isCollidable) { return; }
 
         switch (other.gameObject.tag){
             case "Friendly":
@@ -72,7 +73,7 @@ public class CollisionHandler : MonoBehaviour
         GetComponent<Movement>().enabled = true;
     }
 
-    void LoadNextLevel(){
+    public void LoadNextLevel(){
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         if (nextSceneIndex >= SceneManager.sceneCountInBuildSettings){
