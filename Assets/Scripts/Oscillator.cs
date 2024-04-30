@@ -31,7 +31,10 @@ public class Oscillator : MonoBehaviour
             when checking against 0 for floats use <= Mathf.Epsilon :)
         */
         if(period <= Mathf.Epsilon) return;
+        CalculatePosition();
+    }
 
+    void CalculatePosition(){
         float cycles = Time.time / period;
         float rawSinWave = Mathf.Sin(cycles * TAU);
         /*
@@ -42,5 +45,7 @@ public class Oscillator : MonoBehaviour
         movementFactor = (rawSinWave + 1f) / 2f; //instead of -1 to 1 we want 0 to1
         Vector3 offset = movementVector * movementFactor;
         transform.position = startingPosition + offset;
+    
     }
 }
+
